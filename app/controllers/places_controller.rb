@@ -16,15 +16,25 @@ class PlacesController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+  end  
 
   def show
     @place = Place.find(params[:id])
   end
 
   def update
-  @place = Place.find(params[:id])
+    @place = Place.find(params[:id])
+
   if @place.user != current_user
     return render plain: 'Not Allowed', status: :forbidden
+  end
+
+  @place.update_attributes(place_params)
+  if @place.valid?
+    redirect_to root_path
+  else
+    render :edit, status: :unprocessable_entity
+  end
   end
 
   def destroy
@@ -41,3 +51,6 @@ class PlacesController < ApplicationController
 
   def place_params
     params.require(:place).permit(:name, :description, :address)
+  end
+
+end
